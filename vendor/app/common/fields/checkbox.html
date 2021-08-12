@@ -1,0 +1,30 @@
+<!--
+ * @Title: checkbox多选模块
+ * @Descripttion: checkbox多选模块
+ * @version: 1.0.0
+ * @Author: wzs
+ * @Date: 2020-05-12 22:28:22
+ * @LastEditors: wzs
+ * @LastEditTime: 2020-07-31 14:11:18
+ -->
+<?php
+$optionsarr = '';
+if(is_array($r['options'])){
+    $optionsarr = $r['options'];
+}else{
+    $options    = $r['setup']['options'];
+    $options = explode("\n",$r['setup']['options']);
+    foreach($options as $vs) {
+        $v = explode("|",$vs);
+        $k = $v[1];
+        $optionsarr[$k] = array('title'=>$v[0],'id'=>$v[1]);
+    }
+    $i = 1;
+}
+$value = $form->data[$r['field']];
+if($value != '') $value = strpos($value, ',') ? explode(',', $value) : array($value);
+?>
+{volist name="$optionsarr" id="val" key="key"}
+<input name="{$r['field']}[{$i}]" id="{$r['field']}_{$i}" v="{$value}" key="{$key}" {$value && in_array($val['id'], $value) ? 'checked' : ''} value="{$val['id']}"  {:getvalidate($r)} type="checkbox" class="ace" title="{$val['title']}" {$i++}>
+
+{/volist}

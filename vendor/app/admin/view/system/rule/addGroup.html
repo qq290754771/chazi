@@ -1,0 +1,75 @@
+<!--
+ * @Title: 添加权限分组页面
+ * @Descripttion: 添加权限分组页面
+ * @version: 1.0.0
+ * @Author: wzs
+ * @Date: 2020-05-09 19:58:17
+ * @LastEditors: wzs
+ * @LastEditTime: 2020-06-21 08:49:22
+ -->
+{include file="common/head_form"/}
+<style>
+    html{
+        background-color: #fff;
+    }
+</style>
+<div class="layui-fluid">
+    <form class="layui-form layui-form-pane">
+        <!-- <div class="layui-form-item">
+            <label class="layui-form-label">父级</label>
+            <div class="layui-input-block">
+                <select name="pid" lay-verify="required" lay-filter="pid" >
+                    <option value="0">默认顶级</option>
+                    {volist name="admin_rule" id="vo"}
+                        <option value="{$vo.id}">{$vo.lefthtml}{$vo.name}</option>
+                    {/volist}
+                </select>
+            </div>
+        </div> -->
+        <div class="layui-form-item">
+            <label class="layui-form-label">分组名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" lay-verify="required" placeholder="{:lang('pleaseEnter')}分组名称" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">分组描述</label>
+            <div class="layui-input-block">
+                <input type="text" name="description" lay-verify="required" placeholder="{:lang('pleaseEnter')}分组描述"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-block">
+                <input type="text" name="sort" value="50" placeholder="{:lang('pleaseEnter')}排序编号" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="auth">立即提交</button>
+                <a href="{:url('adminRule')}" lay-close class="layui-btn layui-btn-primary">返回</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    layui.use(['form', 'layer', 'admin'], function () {
+        var form = layui.form,layer = layui.layer,admin = layui.admin(),$= layui.jquery;
+        admin.init()
+        form.on('submit(auth)', function (data) {
+            // 提交到方法 默认为本身
+            $.post("{:url('addGroup')}",data.field,function(res){
+                if(res.code > 0){
+                    layer.msg(res.msg,{time:1000,icon:1},function(){
+                        admin.formReload();
+                    });
+                }else{
+                    layer.msg(res.msg,{time:1000,icon:2});
+                }
+            });
+        })
+    });
+</script>
+{include file="common/foot_form"/}

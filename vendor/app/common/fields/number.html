@@ -1,0 +1,17 @@
+<!--
+ * @Title: number数字模块
+ * @Descripttion: number数字模块
+ * @version: 1.0.0
+ * @Author: wzs
+ * @Date: 2020-05-12 22:28:22
+ * @LastEditors: wzs
+ * @LastEditTime: 2020-05-18 14:49:53
+ -->
+<input
+        type="text"
+        class="input-text {$r['class']} layui-input"
+        name="{$r['field']}"
+        id="{$r['field']}"
+        value="{$form->data[$r['field']] ? $form->data[$r['field']] : $r['setup']['default']}"
+        size="{$r['setup']['size'] ? $r['setup']['size'] : ''}"  {:getvalidate($r)}
+/>

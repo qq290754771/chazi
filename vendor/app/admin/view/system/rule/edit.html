@@ -1,0 +1,111 @@
+<!--
+ * @Title: 编辑权限页面
+ * @Descripttion: 编辑权限页面
+ * @version: 1.0.0
+ * @Author: wzs
+ * @Date: 2020-05-09 19:58:17
+ * @LastEditors: wzs
+ * @LastEditTime: 2020-06-21 08:50:32
+ -->
+{include file="common/head_form"/}
+<style>
+    html{
+        background-color: #fff;
+    }
+</style>
+<div class="layui-fluid">
+    <form class="layui-form layui-form-pane">
+        <input type="hidden" name="id" value="{$rule.id}">
+        <input type="hidden" name="category_id" value="{$rule.category_id}">
+        <div class="layui-form-item">
+            <label class="layui-form-label">权限名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" value="{$rule.name}" lay-verify="required" placeholder="{:lang('pleaseEnter')}权限名称" class="layui-input">
+            </div>
+        </div>
+        <input type="hidden" name="pid" value="{$rule.pid}"  id="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">权限描述</label>
+            <div class="layui-input-block">
+                <input type="text" name="description" value="{$rule.description}"  lay-verify="required"
+                    placeholder="{:lang('pleaseEnter')}权限描述" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">控制器/方法</label>
+            <div class="layui-input-block">
+                <input type="text" name="path" value="{$rule.path}" lay-verify="required" placeholder="{:lang('pleaseEnter')}控制器/方法" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">图标名称</label>
+            <div class="layui-input-block">
+                <input type="hidden" name="icon" value="{$rule.icon?$rule.icon:''}"  placeholder="{:lang('pleaseEnter')}图标名称" class="layui-input">
+                <input type="text" id="iconPicker" lay-filter="iconPicker" class="hide">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单状态</label>
+            <div class="layui-input-block">
+                <input type="radio" name="status" {if condition="$rule['status'] eq 1"}checked{/if} value="1" title="开启">
+                <input type="radio" name="status" {if condition="$rule['status'] eq 0"}checked{/if} value="0" title="关闭">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-block">
+                <input type="text" name="sort" value="{$rule.sort}" placeholder="{:lang('pleaseEnter')}排序编号" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="auth">立即提交</button>
+                <a href="{:url('adminRule')}" class="layui-btn layui-btn-primary">返回</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    layui.use(['form', 'iconPicker', 'layer', 'admin'], function () {
+        var form = layui.form,iconPicker = layui.iconPicker,layer = layui.layer,admin = layui.admin(),$ = layui.jquery;
+        admin.init()
+        iconPicker.render({
+            // 选择器，推荐使用input
+            elem: '#iconPicker',
+            // 数据类型：fontClass/unicode，推荐使用fontClass
+            type: 'fontClass',
+            // 是否开启搜索：true/false，默认true
+            search: true,
+            // 是否开启分页：true/false，默认true
+            page: true,
+            // 每页显示数量，默认12
+            limit: 12,
+            // 点击回调
+            click: function (data) {
+                // console.log(data);
+                $('input[name="icon"]').val(data.icon)
+            },
+            // 渲染成功后的回调
+            success: function (d) {
+                console.log(d);
+            }
+        });
+        {if condition="$rule.icon"}
+        iconPicker.checkIcon('iconPicker', 'layui-icon-{$rule.icon}');
+        {/if}
+        form.on('submit(auth)', function (data) {
+            // 提交到方法 默认为本身
+            $.post("{:url('edit')}",data.field,function(res){
+                if(res.code > 0){
+                    layer.msg(res.msg,{time:1800,icon:1},function(){
+                        admin.formReload();
+                    });
+                }else{
+                    layer.msg(res.msg,{time:1800,icon:2});
+                }
+            });
+        })
+    })
+</script>
+{include file="common/foot_form"/}

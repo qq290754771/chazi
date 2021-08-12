@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+
+
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>{:config('sys_name')}后台登录</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="__STATIC__/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="__ADMIN__/css/admin.css" media="all">
+  <link rel="stylesheet" href="__ADMIN__/css/login.css" media="all">
+</head>
+
+<body>
+  <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+    <div class="layadmin-user-login-main">
+      <div class="layadmin-user-login-box layadmin-user-login-header">
+        <h2>{:config('sys_name')}登录</h2>
+        <!-- <p>酷创网络官方后台系统</p> -->
+      </div>
+      <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+        <div class="layui-form-item" style="font-size: 14px;">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+          <input type="text" name="username" id="LAY-user-login-username" lay-verify="required" placeholder="用户名"
+            class="layui-input">
+        </div>
+        <div class="layui-form-item" style="font-size: 14px;">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+          <input type="password" name="password" id="LAY-user-login-password" lay-verify="required" placeholder="密码"
+            class="layui-input">
+        </div>
+        <div class="layui-form-item">
+          <div id="slider"></div>
+        </div>
+        <!-- <div class="layui-form-item" style="margin-bottom: 20px;">
+            <input type="checkbox" name="remember" lay-skin="primary" title="记住密码">
+            <a href="forget.html" class="layadmin-user-jump-change layadmin-link" style="margin-top: 7px;">忘记密码？</a>
+          </div> -->
+        <div class="layui-form-item">
+          <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-login-submit">登 入</button>
+        </div>
+        <!-- <div class="layui-trans layui-form-item layadmin-user-login-other">
+            <label>社交账号登入</label>
+            <a href="javascript:;"><i class="layui-icon layui-icon-login-qq"></i></a>
+            <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat"></i></a>
+            <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo"></i></a>
+
+            <a href="reg.html" class="layadmin-user-jump-change layadmin-link">注册帐号</a>
+          </div> -->
+      </div>
+    </div>
+
+    <div class="layui-trans layadmin-user-login-footer">
+      <!-- <p>{:config('sys_name')} © {:config('url_domain_root')}</p> -->
+    </div>
+  </div>
+  <style>
+    .slider-item{
+      background: none;
+    }
+    .slider-btn{
+      line-height: 36px;
+    }
+    .layui-bg-green {
+        background-color: rgba(61, 56, 90, 0.6)!important;
+    }
+  </style>
+  <script src="__ADMIN__/js/ribbon.js"></script>
+  <script src="__STATIC__/layui/layui.js"></script>
+  <!-- <script src="__STATIC__/common/js/jquery.2.1.1.min.js"></script>
+  <script src="__ADMIN__/lib/covervid.js"></script> -->
+  <script>
+    if (window != top) {
+      top.location.reload()
+    }
+
+    layui.config({
+      base: '__ADMIN__/js/module/',
+      version: Date.parse(new Date()),
+      debug: true
+    }).extend({
+      sliderVerify: 'sliderVerify'
+    }).use(['sliderVerify', 'jquery', 'form', 'layer'], function () {
+      var $ = layui.jquery,
+        sliderVerify = layui.sliderVerify,
+        layer = layui.layer,
+        form = layui.form,
+        slider = sliderVerify.render({
+          elem: '#slider',
+          onOk: function () {
+            $('.slider-text').addClass('on')
+          }
+        }),
+        init, submit, enter;
+      // 提交表单
+      submit = function () {
+        form.on('submit(LAY-user-login-submit)', function (obj) {
+          if (slider.isOk()) {
+            loading = layer.load(1, {
+              shade: [0.1, '#fff']
+            });
+            $.post('{:url("login/index")}', obj.field, function (res) {
+              layer.close(loading);
+              if (res.code == 1) {
+                layer.msg(res.msg, {
+                  icon: 1,
+                  offset: '15px',
+                  time: 1000
+                }, function () {
+                  location.href = res.url;
+                });
+              } else {
+                layer.msg(res.msg, {
+                  icon: 2,
+                  anim: 6,
+                  offset: '15px',
+                  time: 1000
+                });
+                slider.reset();
+              }
+            });
+            return false;
+          } else {
+            layer.msg("请先通过滑块验证");
+          }
+          return false;
+        });
+      }
+      // 处理回车键
+      enter = function () {
+        $(document).on('keyup', function (event) {
+          var keynum = (event.keyCode ? event.keyCode : event.which);
+          if (keynum == '13') {
+            $('.layui-btn').click()
+          }
+        })
+      }
+      // 初始化
+      init = function () {
+        submit()
+        enter()
+      }()
+    });
+  </script>
+
+
+
+</body>
+
+</html>

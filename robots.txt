@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /app/admin
+Disallow: /core
+Disallow: /public
+Disallow: /vendor
+Disallow: /runtime
+Disallow: /addons

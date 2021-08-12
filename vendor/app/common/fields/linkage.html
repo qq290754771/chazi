@@ -1,0 +1,94 @@
+<!--
+ * @Title: linkage城市联动模块
+ * @Descripttion: linkage城市联动模块
+ * @version: 1.0.0
+ * @Author: wzs
+ * @Date: 2020-05-12 22:28:22
+ * @LastEditors: wzs
+ * @LastEditTime: 2020-05-18 14:49:53
+ -->
+<?php
+    $value = explode(',',$form->data[$r['field']]);
+    $region = db('region')->where(['pid'=>1])->select();
+    if($value[0]){
+    $city = db('region')->where(['pid'=>$value[0]])->select();
+    }
+    if($value[1]){
+    $district = db('region')->where(['pid'=>$value[1]])->select();
+    }
+?>
+<div class="layui-input-inline">
+    <select name="{$r['field']}[]" class="linkage-province" lay-filter="province">
+        <option value="">请选择省</option>
+        {volist name="region" id="v"}
+            {if $value[0] == $v['id']}
+            <option selected value="{$v.id}">{$v.name}</option>
+            {else /}
+            <option value="{$v.id}">{$v.name}</option>
+            {/if}
+        {/volist}
+    </select>
+</div>
+<div class="layui-input-inline">
+    <select name="{$r['field']}[]" id="city" lay-filter="city">
+        <option value="">请选择市</option>
+        {if $city}
+        {volist name="city" id="v"}
+            {if $value[1] == $v['id']}
+            <option selected value="{$v.id}">{$v.name}</option>
+            {else /}
+            <option value="{$v.id}">{$v.name}</option>
+            {/if}
+        {/volist}
+        {/if}
+    </select>
+</div>
+
+<div class="layui-input-inline">
+    <select name="{$r['field']}[]" id="district" lay-filter="district">
+        <option value="">请选择县/区</option>
+        {if $district}
+        {volist name="district" id="v"}
+        {if $value[2] == $v['id']}
+        <option selected value="{$v.id}">{$v.name}</option>
+        {else /}
+        <option value="{$v.id}">{$v.name}</option>
+        {/if}
+        {/volist}
+        {/if}
+    </select>
+</div>
+<script>
+    layui.use(['form','laydate'], function () {
+        var form = layui.form, laydate = layui.laydate;
+
+        form.on('select(province)', function (data) {
+            var pid = data.value;
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.get("{:url('publics/getRegion')}?pid=" + pid, function (data) {
+                layer.close(loading);
+                var html = '<option value="">请选择市</option>';
+                $.each(data, function (i, value) {
+                    html += '<option value="' + value.id + '">' + value.name + '</option>';
+                });
+                $('#city').html(html);
+                $('#district').html('<option value="">请选择县/区</option>');
+                form.render()
+            });
+        });
+        form.on('select(city)', function (data) {
+            var pid = data.value;
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.get("{:url('publics/getRegion')}?pid=" + pid, function (data) {
+                layer.close(loading);
+                var html = '<option value="">请选择县/区</option>';
+                $.each(data, function (i, value) {
+                    html += '<option value="' + value.id + '">' + value.name + '</option>';
+                });
+                $('#district').html(html);
+
+                form.render()
+            });
+        });
+    })
+</script>

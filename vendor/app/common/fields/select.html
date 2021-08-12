@@ -1,0 +1,78 @@
+<!--
+ * @Title: select下拉列表模块
+ * @Descripttion: select下拉列表模块
+ * @version: 1.0.0
+ * @Author: wzs
+ * @Date: 2020-05-12 22:28:22
+ * @LastEditors: wzs
+ * @LastEditTime: 2020-08-01 22:46:16
+ -->
+<?php
+$optionsarr = '';
+    if(is_array($r['options'])){
+        
+        $i = 0;
+        foreach($r['options'] as $k =>$v) {
+            $optionsarr[$i] = array('name' => $v,'value'=>$k);
+            $i++;
+        }
+    }else{
+        $options    = $r['setup']['options'];
+        $options = explode("\n",$r['setup']['options']);
+        foreach($options as $kk =>$v) {
+            $v = explode("|",$v);
+            $k = trim($v[1]);
+            $optionsarr[$kk]=array('name' => $v[0],'value'=>$k);
+
+        }
+        
+    }
+   
+    $optionsarr = json_encode($optionsarr);
+?>
+{switch name="$r['setup']['multiple']"}
+ {case value="0"}
+    <div id="{$r['field']}"></div>
+    <script>
+        // https://maplemei.gitee.io/xm-select/#/senior/form
+        var {$r['field']} = xmSelect.render({
+            el: '#{$r["field"]}',
+            name: '{$r["field"]}',
+            tips: "请选择{$r['name']}{$r['required']==1 ? '(必填)' : ''}",
+            language: 'zn',
+            radio: true,
+            paging: false,
+            filterable: true,
+            data: {$optionsarr}
+        })
+            {if condition="$form->data[$r['field']]"}
+            {$r['field']}.setValue([
+                {value: {$form->data[$r['field']]}},
+            ])
+            {/if}
+    </script>
+ {/case}
+ {case value="1"}
+    <div id="{$r['field']}"></div>
+    <script>
+        // https://maplemei.gitee.io/xm-select/#/senior/form
+        var {$r['field']} = xmSelect.render({
+            el: '#{$r["field"]}',
+            name: '{$r["field"]}',
+            tips: "请选择{$r['name']}{$r['required']==1 ? '(必填)' : ''}",
+            language: 'zn',
+            paging: true,
+            filterable: true,
+            data: {$optionsarr}
+        })
+        {if condition="$form->data[$r['field']]"}
+            {$r['field']}.setValue([
+                <?php $aa = explode(',',$form->data[$r['field']]);?>
+                {volist name="aa" id="vo"}
+                {value: {$vo}},
+                {/volist}
+            ])
+        {/if}
+    </script>
+ {/case}
+ {/switch}

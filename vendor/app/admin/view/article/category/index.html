@@ -1,0 +1,164 @@
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="admin-main layui-anim layui-anim-upbit">
+            <div class="layui-card-header">栏目{:lang('list')}</div>
+            <div class="layui-card-body" pad15>
+                <div style="padding-bottom: 10px;">
+                    <a pop-href="{:url('add')}" class="layui-btn layui-btn-sm">{:lang('add')}栏目</a>
+                    <a href="javascript:void(0);" id="btn-refresh" class="layui-btn layui-btn-sm">刷新栏目</a>
+                    <a href="javascript:void(0);" id="btn-expand" class="layui-btn layui-btn-sm">全部展开</a>
+                    <a href="javascript:void(0);" id="btn-fold" class="layui-btn layui-btn-sm">全部折叠</a>
+                </div>
+                <!-- <table class="layui-table" id="list" lay-filter="list"></table> -->
+                <table id="auth-table" class="layui-table" lay-filter="auth-table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style type="text/css">
+    fieldset { position: relative; }
+    fieldset legend a{ position: absolute; right: 0; top: 0;}
+</style>
+<script type="text/html" id="auth-state">
+    <a class="layui-btn layui-btn-xs" pop-href="{:url('edit')}?id={{d.id}}">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script type="text/javascript">
+layui.use(['table', 'treetable', 'admin'], function() {
+    var $ = layui.jquery;
+    var table = layui.table;
+    var treetable = layui.treetable;
+    var admin = layui.admin();
+    admin.init();
+        // 渲染表格
+        var renderTable = function() {
+        layer.load(2);
+        treetable.render({
+            treeColIndex: 1,
+            treeSpid: 42,
+            treeIdName: 'id',
+            treePidName: 'pid',
+            elem: '#auth-table',
+            method: "post",
+            url: '{:url("index")}', //这里可以去看文档,可以用url,也可以直接使用json字符串
+            page: false, //不可分页
+            cols: [
+                [{ //表头格式
+                        type: 'numbers'
+                    }, {
+                        field: 'name', //对于的json字符的键
+                        minWidth: 200, //宽度
+                        title: '栏目名称',
+                    }, {
+                        field: 'module',
+                        title: '所属模型'
+                    }, 
+                    {field: 'sort', width: 80, align: 'center', title: '排序号',templet: function (d) {
+						return '<input name="'+d.id+'" data-id="'+d.id+'" class="list_order layui-input" value="'+d.sort+'" size="10" style="text-align:center;padding-left:0;"/>'
+					}},
+                    {
+                    field: 'ismenu', width: 80, align: 'center', templet: function (d) {
+                    if (d.ismenu == 1) {
+                        return '<a class="layui-btn layui-btn-xs layui-bg-gray" lay-event="changeStatus">显示</a>';
+                    } else {
+                        return '<a class="layui-btn layui-btn-xs" lay-event="changeStatus">隐藏</a>';
+                    }
+                    }, title: '导航'
+                    },
+                    {
+                        templet: '#auth-state',
+                        width: 120,
+                        align: 'center',
+                        title: '操作'
+                    }
+                ]
+            ],
+            done: function() {
+                layer.closeAll('loading');
+                admin.init();
+            }
+        });
+    }
+    renderTable();
+    table.on('tool(auth-table)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if (layEvent === 'del') {
+                // layer.msg('删除' + data.id);
+                layer.confirm('您确定要删除该记录吗？', function(index){
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:url('del')}",{id:data.id},function(res){
+                        layer.close(loading);
+                        if(res.code==1){
+                            layer.msg(res.msg,{time:1000,icon:1});
+                            obj.del();
+                        }else{
+                            layer.msg(res.msg,{time:1000,icon:2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if (layEvent === 'edit') {
+                layer.msg('修改' + data.id);
+            } else if (layEvent === 'changeStatus'){
+                // layer.msg('改状态' + data.id);
+                loading =layer.load(1, {shade: [0.1,'#fff']});
+                $.post('{:url("ruleState")}',{'id': data.id},function (res) {
+                    layer.close(loading);
+                    if (res.status==1) {
+                        renderTable();
+                    }else{
+                        layer.msg('操作失败！',{time:1000,icon:2});
+                        return false;
+                    }
+                })
+            }
+        });
+    $('#btn-expand').click(function() {
+        treetable.expandAll('#auth-table');
+    });
+
+    $('#btn-fold').click(function() {
+        treetable.foldAll('#auth-table');
+    });
+    $('#btn-refresh').click(function () {
+            renderTable();
+    });
+    
+    $('.delGroup').click(function(){
+        var id = $(this).data('id');
+         layer.confirm('您确定要删除该记录吗？', function(index){
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post("{:url('ruleDelGroup')}",{id: id},function(res){
+                layer.close(loading);
+                if(res.code==1){
+                    layer.msg(res.msg,{time:1000,icon:1});
+                    window.location.reload()
+                }else{
+                    layer.msg(res.msg,{time:1000,icon:2});
+                }
+                });
+                layer.close(index);
+            });
+    })
+    // 更改排序
+	$('body').on('blur','.list_order',function() {
+        var id = $(this).attr('data-id');
+        var sort = $(this).val();
+        var loading = layer.load(1, {shade: [0.1, '#fff']});
+        $.post('{:url("ruleOrder")}',{id:id,sort:sort},function(res){
+            layer.close(loading);
+            if(res.code === 1){
+                layer.msg('排序成功', {time: 1000, icon: 1}, function () {
+                    renderTable();
+                });
+            }else{
+                layer.msg(res.msg,{time:1000,icon:2});
+            }
+        })
+    });
+})
+</script>
+{include file="common/foot"/}

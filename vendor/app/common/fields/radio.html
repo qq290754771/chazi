@@ -1,0 +1,29 @@
+<!--
+ * @Title: 
+ * @Author: wzs
+ * @Date: 2020-05-14 16:19:47
+ * @LastEditors: wzs
+ * @LastEditTime: 2020-05-15 10:20:27
+ * @Description: 
+ -->
+
+<?php
+ $value = $form->data[$r['field']];
+ $r['setup'] = is_array($r['setup']) ? $r['setup'] : string2array($r['setup']);
+ $value = $value ? $value : $r['setup']['default'];
+ $labelwidth = $r['setup']['labelwidth'];
+ $optionsarr = [];
+ if (isset($r['setup']['options'])) {
+    $options = $r['setup']['options'];
+    $options = explode("\n", $r['setup']['options']);
+    foreach ($options as $kk => $rr) {
+        $v = explode("|", $rr);
+        $k = trim($v[1]);
+        $optionsarr[$kk]['title'] = $v[0];
+        $optionsarr[$kk]['id'] = $k;
+    }
+ }
+?>
+{volist name="optionsarr"  id="vo"}
+<input name="{$r['field']}" id="{$r['field']}_{$i}" {if condition="$value eq $vo.id"}checked{/if}  value="{$vo.id}"   type="radio" class="ace" title="{$vo.title}" />
+{/volist}

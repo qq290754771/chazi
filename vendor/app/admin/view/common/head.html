@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>{:config('sys_name')}</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="__STATIC__/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="__ADMIN__/css/admin.css" media="all">
+  <link rel="stylesheet" href="__ADMIN__/css/tableFilter.css" media="all">
+
+  <!-- <link rel="stylesheet" href="__ADMIN__/css/template.css" media="all">
+  <link rel="stylesheet" href="__STATIC__/plugins/font-awesome/css/font-awesome.min.css" media="all"> -->
+  <script src="__STATIC__/layui/layui.js"></script>
+  <script src="__STATIC__/ueditor/ueditor.config.js" type="text/javascript"></script>
+  <script src="__STATIC__/ueditor/ueditor.all.min.js" type="text/javascript"></script>
+  <script src="__STATIC__/common/js/jquery.2.1.1.min.js"></script>
+  <script src="__STATIC__/admin/js/xm-select.js"></script>
+  <script src="__STATIC__/admin/js/spectrum/spectrum.js"></script>
+  <link rel="stylesheet" href="__STATIC__/admin/js/spectrum/spectrum.css">
+  <script src='__STATIC__/common/js/layui-mz-min.js'></script>
+  <style>
+      .layui-carousel>[carousel-item]>*{
+        background-color: #fff;
+      }
+
+      .layui-nav .layui-carousel .layui-this:after{
+        display: none;
+      }
+  </style>
+</head>
+
+
+<body style="font-size:14px">
+  <div id="LAY_app">
+    <div class="layui-layout layui-layout-admin">
+      <!-- 侧边菜单 -->
+      <div class="layui-layout-main">
+        <div class="layui-header">
+          <!-- 头部区域 -->
+          <ul class="layui-nav layui-layout-left">
+            <li class="layui-nav-item layadmin-flexible" lay-unselect>
+              <a href="javascript:;" layadmin-event="flexible" title="侧边伸缩">
+                  <i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>
+                </a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs" lay-unselect>
+              <a href="/admin/index.html" target="_blank" title="前台">
+                  <i class="layui-icon layui-icon-website"></i>
+                </a>
+            </li>
+            <li class="layui-nav-item" lay-unselect>
+              <a href="javascript:;" layadmin-event="refresh" data-url="{:url('index/clear')}" title="刷新">
+                  <i class="layui-icon layui-icon-refresh-3"></i>
+                </a>
+            </li>
+          </ul>
+          <ul class="layui-nav layui-layout-right" style="padding-right: 20px;" lay-filter="layadmin-layout-right">
+            <li class="layui-nav-item" lay-unselect>
+              <a href="javascript:;"><img src="{:imgUrl(session('avatar'))}" class="layui-nav-img">{:session('username')}</a>
+              <dl class="layui-nav-child">
+              {if condition="session('admin_id') == 1"}
+                <dd><a pop-href="{:url('system.admin/edit')}?admin_id={:session('admin_id')}" href="javascript:void(0)"><i class="layui-icon layui-icon-tips" style="margin-right: 10px;"></i>基本资料</a></dd>
+                <dd><a pop-href="{:url('system.admin/edit')}?admin_id={:session('admin_id')}" style="display:flex;justify-content: center;" href="javascript:void(0)"><i class="layui-icon layui-icon-password" style="margin-right: 10px;"></i>修改密码</a></dd>
+                <hr>
+              {/if}
+                <dd ><a href="{:url('index/logout')}" style="display:flex;justify-content: center;"><i class="layui-icon layui-icon-logout" style="margin-right: 10px;"></i><span>退出登录</span></a></dd>
+              </dl>
+            </li>
+          </ul>
+        </div>
+        <div class="layui-side layui-side-menu">
+      <div class="layui-side-scroll">
+        <div class="layui-logo" lay-href="{:url('main')}">
+          <span style="font-size:24px;font-weight: bold;">{:config('sys_name')}</span>
+        </div>
+
+        <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
+          {volist name="menus" id="vo"}
+          <li data-name="{$vo.title}" class="layui-nav-item">
+            {if condition="$vo.children"}
+            <a href="javascript:;" lay-tips="{$vo.name}" lay-direction="2">
+              <i class="layui-icon layui-icon-{$vo.icon}"></i>
+                <cite>{$vo.name}</cite>
+            </a>
+            {else}
+            <a {if condition="$vo.path neq '#'"}lay-href="{:url($vo.path)}" {/if} lay-tips="{$vo.name}" lay-direction="2">
+              <i class="layui-icon layui-icon-{$vo.icon}"></i>
+                <cite>{$vo.name}</cite>
+            </a>
+            {/if}
+              {if condition="$vo.children"}
+                {volist name="$vo.children" id="voa"}
+                <dl class="layui-nav-child">
+                  {if condition="$voa.children"}
+                  <dd data-name="{$vob.name}">
+                    <a href="javascript:;">{$voa.name}</a>
+                    <dl class="layui-nav-child">
+                      {volist name="$voa.children" id="vob"}
+                      <dd data-name="{$vob.name}" class="layui-nav-item">
+                        {if condition="$vob.children"}
+                        <a href="javascript:;">{$vob.name}</a>
+                        <dl class="layui-nav-child">
+                          {volist name="$vob.children" id="voc"}
+                          <dd data-name="{$voc.name}"><a lay-href="{:url($voc.path)}">{$voc.name}</a></dd>
+                          {/volist}
+                        </dl>
+                        {else}
+                        <a lay-href="{:url($vob.path)}">{$vob.name}</a>
+                        {/if}
+                      </dd>
+                      {/volist}
+                    </dl>
+                  </dd>
+                  {else}
+                  <dd data-name="{$vob.name}">
+                    <a lay-href="{:url($voa.path)}">{$voa.name}</a>
+                  </dd>
+                  {/if}
+                </dl>
+                {/volist}
+              {/if}
+          </li>
+          {/volist}
+        </ul>
+      </div>
+    </div>
+         
+        <div class="layui-body" >
+          <div class="layadmin-tabsbody-item layui-show" id="LAY_app_body">
+              <div class="layui-breadcrumb" lay-filter="breadcrumb" style="visibility: visible;">
+                <a lay-href="/admin">首页</a><span lay-separator="">/</span>
+                {if condition="$active_pname"}<a >{$active_pname}</a><span lay-separator="">/</span>{/if}
+                <a><cite>{$active_name}</cite></a>
+              </div>
+

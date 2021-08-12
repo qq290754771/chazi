@@ -1,0 +1,39 @@
+<!--
+ * @Title:
+ * @Descripttion:
+ * @version:
+ * @Author: wzs
+ * @Date: 2020-05-09 19:58:17
+ * @LastEditors: wzs
+ * @LastEditTime: 2020-07-29 17:07:19
+ -->
+{include file="common/head"/}
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">操作记录{:lang('list')}</div>
+        <div class="layui-card-body" pad15 style="padding-top: 5px;">
+            <table class="layui-table" id="list" lay-filter="list"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['table','admin'], function() {
+        var table = layui.table,$ = layui.jquery,admin = layui.admin();
+        admin.init();
+        table.render({
+            elem: '#list',
+            url: '{:url("logList")}?admin_id={:input("admin_id")}',
+            method:'post',
+            page: true,
+            cols: [[
+                {field:'user_name', width: 100, title: '用户名', fixed: true}
+                ,{field:'name', width: 100, title: '{:lang("userGroup")}'}
+                ,{field:'log', title: '信息'}
+                ,{field:'addtime', width: 180, title: '时间'}
+            ]],
+            limit: 10
+        });
+    });
+</script>
+{include file="common/foot"/}
